@@ -1,0 +1,6 @@
+curl -sS --max-time 15 -X PUT http://localhost:5000/api/courses/1 -H 'Content-Type: application/json' -d '{"target_date": "2026-02-30"}' -w '
+HTTP_STATUS:%{http_code}
+'
+{"error":"target_date must be a valid date in YYYY-MM-DD format","success":false}
+
+HTTP_STATUS:400

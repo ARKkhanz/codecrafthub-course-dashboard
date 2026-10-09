@@ -1,0 +1,6 @@
+curl -sS --max-time 15 -X PUT http://localhost:5000/api/courses/1 -H 'Content-Type: application/json' -d '{"status": "Invalid"}' -w '
+HTTP_STATUS:%{http_code}
+'
+{"error":"Status must be one of: Not Started, In Progress, Completed","success":false}
+
+HTTP_STATUS:400

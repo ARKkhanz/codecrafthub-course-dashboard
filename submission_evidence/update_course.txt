@@ -1,0 +1,6 @@
+curl -sS --max-time 15 -X PUT http://localhost:5000/api/courses/1 -H 'Content-Type: application/json' -d '{"status": "In Progress"}' -w '
+HTTP_STATUS:%{http_code}
+'
+{"course":{"created_at":"2026-10-09 12:58:04","description":"Learn variables, loops, and functions","id":1,"name":"Python Basics","status":"In Progress","target_date":"2026-12-31"},"message":"Course updated successfully","success":true}
+
+HTTP_STATUS:200

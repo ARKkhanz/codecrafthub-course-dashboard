@@ -1,0 +1,6 @@
+curl -sS --max-time 15 -X POST http://localhost:5000/api/courses -H 'Content-Type: application/json' -d '{"name": "Python Basics", "description": "Learn variables, loops, and functions", "target_date": "2026-12-31", "status": "Not Started"}' -w '
+HTTP_STATUS:%{http_code}
+'
+{"course":{"created_at":"2026-10-09 12:58:04","description":"Learn variables, loops, and functions","id":1,"name":"Python Basics","status":"Not Started","target_date":"2026-12-31"},"message":"Course added successfully","success":true}
+
+HTTP_STATUS:201

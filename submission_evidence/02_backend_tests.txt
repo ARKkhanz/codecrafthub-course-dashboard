@@ -1,0 +1,12 @@
+test_bad_json_and_missing_course (test_api.CourseTests) ... ok
+test_corrupt_file_is_preserved (test_api.CourseTests) ... ok
+test_cors (test_api.CourseTests) ... ok
+test_crud_and_persistence (test_api.CourseTests) ... ok
+test_failed_write (test_api.CourseTests) ... ok
+test_invalid_fields (test_api.CourseTests) ... ok
+test_statistics (test_api.CourseTests) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.054s
+
+OK

@@ -1,0 +1,951 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeCraftHub: Your Learning Management Platform</title>
+    <style>
+      /* =========================== Design Tokens =========================== */
+      :root {
+        --primary: #8B5CF6;       /* purple – primary actions */
+        --primary-dark: #7C3AED;
+        --primary-light: #A78BFA;
+        --success: #F59E0B;       /* amber – success accent */
+        --success-dark: #D97706;
+        --danger: #EF4444;        /* red – remove / error */
+        --danger-dark: #DC2626;
+        --ink: #1E1B2E;           /* main text */
+        --ink-soft: #6B7280;      /* secondary text */
+        --surface: #FFFFFF;       /* card / panel background */
+        --surface-alt: #F9FAFB;   /* table stripe */
+        --border: #E5E7EB;
+        --ring: rgba(139, 92, 246, 0.35);
+        --radius: 10px;
+        --radius-sm: 6px;
+        --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+        --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
+        --font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: var(--font);
+        color: var(--ink);
+        background: #F3F4F6;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* =========================== Layout =========================== */
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem 1.25rem 4rem;
+      }
+
+      /* =========================== Header =========================== */
+      header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      header h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0 0 .25rem;
+        color: var(--primary-dark);
+      }
+      header p {
+        margin: 0;
+        color: var(--ink-soft);
+        font-size: .95rem;
+      }
+
+      /* =========================== Card panels =========================== */
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+      .panel h2 {
+        margin: 0 0 1rem;
+        font-size: 1.15rem;
+        font-weight: 600;
+      }
+
+      /* =========================== Form controls =========================== */
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+      .form-grid .full { grid-column: 1 / -1; }
+
+      label {
+        display: block;
+        font-size: .85rem;
+        font-weight: 600;
+        margin-bottom: .3rem;
+        color: var(--ink);
+      }
+      input, textarea, select {
+        width: 100%;
+        padding: .55rem .7rem;
+        font-size: .95rem;
+        font-family: inherit;
+        color: var(--ink);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        transition: border-color .15s, box-shadow .15s;
+      }
+      textarea { resize: vertical; min-height: 70px; }
+      input:focus, textarea:focus, select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--ring);
+      }
+      input[disabled], textarea[disabled], select[disabled] {
+        background: var(--surface-alt);
+        cursor: not-allowed;
+        opacity: .6;
+      }
+      .field-error {
+        display: none;
+        font-size: .8rem;
+        color: var(--danger);
+        margin-top: .25rem;
+        font-weight: 500;
+      }
+      .field-error.show { display: block; }
+
+      /* =========================== Buttons =========================== */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        padding: .55rem 1.1rem;
+        font-size: .9rem;
+        font-weight: 600;
+        font-family: inherit;
+        border: 1px solid transparent;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: background .15s, border-color .15s, box-shadow .15s, opacity .15s;
+        text-decoration: none;
+        line-height: 1;
+      }
+      .btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--ring);
+      }
+      .btn-primary { background: #8B5CF6; color: #fff; }
+      .btn-primary:hover { background: var(--primary-dark); }
+      .btn-secondary { background: var(--surface); border-color: var(--border); color: var(--ink); }
+      .btn-secondary:hover { border-color: var(--primary); color: var(--primary-dark); }
+      .btn-success { background: #F59E0B; color: #fff; }
+      .btn-success:hover { background: var(--success-dark); }
+      .btn-danger { background: var(--danger); color: #fff; }
+      .btn-danger:hover { background: var(--danger-dark); }
+      .btn-ghost { background: transparent; border-color: transparent; color: var(--primary-dark); padding: .35rem .6rem; }
+      .btn-ghost:hover { background: rgba(139,92,246,.08); }
+      .btn-ghost.danger { color: var(--danger); }
+      .btn-ghost.danger:hover { background: rgba(239,68,68,.08); }
+      .btn[disabled] { opacity: .5; cursor: not-allowed; }
+      .form-actions {
+        display: flex;
+        gap: .6rem;
+        margin-top: 1.25rem;
+      }
+
+      /* =========================== Toolbar =========================== */
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: .75rem;
+      }
+      .toolbar h2 { margin: 0; }
+
+      /* =========================== Spinner =========================== */
+      .spinner {
+        display: inline-block;
+        width: 16px; height: 16px;
+        border: 2px solid rgba(139,92,246,.25);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin .6s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .spinner-overlay {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(255,255,255,.6);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: .75rem;
+      }
+      .spinner-overlay.show { display: flex; }
+      .spinner-overlay .spinner { width: 36px; height: 36px; border-width: 3px; }
+      .spinner-overlay p { font-weight: 600; color: var(--primary-dark); }
+
+      /* =========================== Alerts / aria-live =========================== */
+      #alert {
+        min-height: 0;
+        margin-bottom: 1rem;
+        font-size: .9rem;
+        font-weight: 500;
+        border-radius: var(--radius-sm);
+        padding: 0;
+        transition: padding .15s;
+      }
+      #alert.show {
+        padding: .65rem .9rem;
+        border: 1px solid transparent;
+      }
+      #alert.success { background: #FEF3C7; color: #92400E; border-color: #FDE68A; }
+      #alert.error   { background: #FEE2E2; color: #991B1B; border-color: #FECACA; }
+      #alert.info    { background: #EDE9FE; color: #5B21B6; border-color: #DDD6FE; }
+
+      /* =========================== Course cards =========================== */
+      .course-list { display: grid; gap: 1rem; }
+      .course-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 1.25rem;
+        transition: box-shadow .15s;
+      }
+      .course-card:hover { box-shadow: var(--shadow-lg); }
+      .course-card .cc-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: .5rem;
+      }
+      .course-card .cc-name { font-size: 1.1rem; font-weight: 700; margin: 0; }
+      .course-card .cc-desc {
+        color: var(--ink-soft);
+        font-size: .92rem;
+        margin: 0 0 .75rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .course-card .cc-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem 1.5rem;
+        font-size: .82rem;
+        color: var(--ink-soft);
+        margin-bottom: .75rem;
+      }
+      .course-card .cc-meta b { color: var(--ink); font-weight: 600; }
+      .course-card .cc-actions {
+        display: flex;
+        gap: .4rem;
+        border-top: 1px solid var(--border);
+        padding-top: .75rem;
+      }
+
+      /* =========================== Status badges =========================== */
+      .badge {
+        display: inline-block;
+        padding: .2rem .6rem;
+        font-size: .78rem;
+        font-weight: 600;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .badge.not-started   { background: #E0E7FF; color: #3730A3; }
+      .badge.in-progress   { background: #FEF3C7; color: #92400E; }
+      .badge.completed     { background: #D1FAE5; color: #065F46; }
+
+      /* =========================== Empty state =========================== */
+      .empty-state {
+        text-align: center;
+        padding: 2.5rem 1rem;
+        color: var(--ink-soft);
+      }
+      .empty-state svg { width: 48px; height: 48px; opacity: .4; margin-bottom: .5rem; }
+
+      /* =========================== Modal =========================== */
+      .modal-backdrop {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(30,27,46,.45);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      .modal-backdrop.show { display: flex; }
+      .modal {
+        background: var(--surface);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-lg);
+        width: 100%;
+        max-width: 520px;
+        max-height: 90vh;
+        overflow-y: auto;
+        animation: modalIn .15s ease-out;
+      }
+      @keyframes modalIn { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+      .modal-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .modal-head h3 { margin: 0; font-size: 1.1rem; color: var(--primary-dark); }
+      .modal-body { padding: 1.5rem; }
+      .modal-close {
+        background: none; border: none; cursor: pointer;
+        font-size: 1.4rem; color: var(--ink-soft); line-height: 1; padding: 0 .2rem;
+      }
+      .modal-close:hover { color: var(--ink); }
+
+      /* =========================== Confirm dialog =========================== */
+      .confirm-card { text-align: center; padding: 1.75rem 1.5rem; }
+      .confirm-card .confirm-icon {
+        width: 48px; height: 48px;
+        background: #FEE2E2; color: var(--danger);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto .75rem;
+        font-size: 1.5rem; font-weight: 700;
+      }
+      .confirm-card p { color: var(--ink-soft); margin: 0 0 1.5rem; }
+      .confirm-card .confirm-name {
+        display: block; font-weight: 700; color: var(--ink);
+        margin-top: .25rem; word-break: break-word;
+      }
+      .confirm-actions {
+        display: flex; gap: .6rem; justify-content: center;
+      }
+
+      /* =========================== Responsive =========================== */
+      @media (max-width: 640px) {
+        .form-grid { grid-template-columns: 1fr; }
+        .course-card .cc-head { flex-direction: column; }
+        .course-card .cc-meta { flex-direction: column; gap: .25rem 0; }
+        header h1 { font-size: 1.4rem; }
+        .container { padding: 1.25rem .75rem 3rem; }
+      }
+    </style>
+    <meta property="og:image" content="https://bolt.new/static/og_default.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
+</head>
+  <body>
+    <!-- Full-screen loading overlay shown during any API request -->
+    <div id="spinnerOverlay" class="spinner-overlay" role="status" aria-live="polite">
+      <div class="spinner"></div>
+      <p id="spinnerText">Working…</p>
+    </div>
+
+    <div class="container">
+      <!-- ============ Header ============ -->
+      <header>
+        <h1>CodeCraftHub: Your Learning Management Platform</h1>
+        <p>Plan, track, and manage your learning courses.</p>
+      </header>
+
+      <!-- ============ Alert / aria-live region ============ -->
+      <div id="alert" role="status" aria-live="polite" aria-atomic="true"></div>
+
+      <!-- ============ Add Course Form ============ -->
+      <section class="panel" aria-labelledby="addHeading">
+        <h2 id="addHeading">Add Course</h2>
+        <form id="addForm" novalidate>
+          <div class="form-grid">
+            <div class="full">
+              <label for="name">Name <span aria-hidden="true">*</span></label>
+              <input type="text" id="name" name="name" autocomplete="off" required />
+              <div class="field-error" id="nameError">Please enter a course name.</div>
+            </div>
+            <div class="full">
+              <label for="description">Description <span aria-hidden="true">*</span></label>
+              <textarea id="description" name="description" required></textarea>
+              <div class="field-error" id="descriptionError">Please enter a description.</div>
+            </div>
+            <div>
+              <label for="target_date">Target Date <span aria-hidden="true">*</span></label>
+              <input type="date" id="target_date" name="target_date" required />
+              <div class="field-error" id="target_dateError">Please choose a valid date.</div>
+            </div>
+            <div>
+              <label for="status">Status <span aria-hidden="true">*</span></label>
+              <select id="status" name="status" required>
+                <option value="" disabled selected>Select status…</option>
+                <option value="Not Started">Not Started</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+              <div class="field-error" id="statusError">Please select a status.</div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="addBtn">Add Course</button>
+            <button type="reset" class="btn btn-secondary" id="addReset">Clear</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ============ Course List ============ -->
+      <section aria-labelledby="listHeading">
+        <div class="toolbar">
+          <h2 id="listHeading">Courses</h2>
+          <button class="btn btn-secondary" id="refreshBtn">
+            <span id="refreshSpinner" class="spinner" style="display:none;"></span>
+            Refresh
+          </button>
+        </div>
+        <div id="courseList" class="course-list">
+          <!-- Cards rendered here by JS -->
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ Edit Modal ============ -->
+    <div class="modal-backdrop" id="editBackdrop" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+      <div class="modal">
+        <div class="modal-head">
+          <h3 id="editTitle">Edit Course</h3>
+          <button class="modal-close" id="editClose" aria-label="Close edit dialog">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="editForm" novalidate>
+            <input type="hidden" id="editId" />
+            <div class="full" style="margin-bottom:1rem;">
+              <label for="editName">Name <span aria-hidden="true">*</span></label>
+              <input type="text" id="editName" required />
+              <div class="field-error" id="editNameError">Please enter a course name.</div>
+            </div>
+            <div class="full" style="margin-bottom:1rem;">
+              <label for="editDescription">Description <span aria-hidden="true">*</span></label>
+              <textarea id="editDescription" required></textarea>
+              <div class="field-error" id="editDescriptionError">Please enter a description.</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
+              <div>
+                <label for="editTargetDate">Target Date <span aria-hidden="true">*</span></label>
+                <input type="date" id="editTargetDate" required />
+                <div class="field-error" id="editTargetDateError">Please choose a valid date.</div>
+              </div>
+              <div>
+                <label for="editStatus">Status <span aria-hidden="true">*</span></label>
+                <select id="editStatus" required>
+                  <option value="" disabled>Select status…</option>
+                  <option value="Not Started">Not Started</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                </select>
+                <div class="field-error" id="editStatusError">Please select a status.</div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="editSaveBtn">Save Changes</button>
+              <button type="button" class="btn btn-secondary" id="editCancelBtn">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ Confirm Remove Modal ============ -->
+    <div class="modal-backdrop" id="confirmBackdrop" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="modal">
+        <div class="confirm-card">
+          <div class="confirm-icon" aria-hidden="true">!</div>
+          <h3 id="confirmTitle" style="margin:0 0 .5rem; font-size:1.1rem;">Remove Course?</h3>
+          <p>This action cannot be undone.
+            <span class="confirm-name" id="confirmName"></span>
+          </p>
+          <div class="confirm-actions">
+            <button class="btn btn-danger" id="confirmYesBtn">Remove</button>
+            <button class="btn btn-secondary" id="confirmNoBtn">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* =================================================================
+       * CodeCraftHub — Course Management Dashboard
+       * Vanilla JS · fetch + async/await · single-file app
+       * ================================================================= */
+
+      const API_URL = "https://amarson212-5000.theianext-0-labs-prod-misc-tools-us-east-0.proxy.cognitiveclass.ai/api/courses";
+      const VALID_STATUSES = ["Not Started", "In Progress", "Completed"];
+
+      /* ---------- DOM refs ---------- */
+      const $ = (id) => document.getElementById(id);
+      const addForm     = $("addForm");
+      const courseList  = $("courseList");
+      const alertBox    = $("alert");
+      const spinnerOv   = $("spinnerOverlay");
+      const spinnerText = $("spinnerText");
+      const refreshBtn  = $("refreshBtn");
+      const refreshSpin = $("refreshSpinner");
+
+      /* Edit modal refs */
+      const editBackdrop  = $("editBackdrop");
+      const editForm      = $("editForm");
+      const editCloseBtn  = $("editClose");
+      const editCancelBtn = $("editCancelBtn");
+
+      /* Confirm modal refs */
+      const confirmBackdrop = $("confirmBackdrop");
+      const confirmYesBtn   = $("confirmYesBtn");
+      const confirmNoBtn    = $("confirmNoBtn");
+      const confirmNameEl   = $("confirmName");
+
+      /* ---------- App state ---------- */
+      let busy = false;            // true while any request is pending
+      let pendingDeleteId = null;  // course id awaiting confirmation
+
+      /* =================================================================
+       * Utility helpers
+       * ================================================================= */
+
+      /* Show / hide the full-screen spinner and disable interactive controls */
+      function setBusy(state, msg) {
+        busy = state;
+        spinnerText.textContent = msg || "Working…";
+        spinnerOv.classList.toggle("show", state);
+        refreshSpin.style.display = state ? "inline-block" : "none";
+        // Disable every interactive control across the page while requests are pending
+        document.querySelectorAll("button, input, textarea, select").forEach(el => {
+          el.disabled = state;
+        });
+      }
+
+      /* Show an alert message in the aria-live region; auto-fades after 5s
+         but keeps the message if refreshFlag is set (so a refresh won't erase it). */
+      let alertTimer = null;
+      function showAlert(msg, type) {
+        const level = type || "info";
+        alertBox.className = "show " + level;
+        alertBox.textContent = msg;
+        if (alertTimer) clearTimeout(alertTimer);
+        alertTimer = setTimeout(() => {
+          alertBox.className = "";
+          alertBox.textContent = "";
+        }, 5000);
+      }
+
+      /* Clear validation error for a single field */
+      function clearFieldError(errorEl) { errorEl.classList.remove("show"); }
+
+      /* Check that a date string is valid YYYY-MM-DD using a calendar round-trip.
+         Date.parse alone normalizes impossible dates like 2024-02-30, so we
+         parse the parts and confirm they reassemble to the same date. */
+      function isValidDate(str) {
+        if (!str || !/^\d{4}-\d{2}-\d{2}$/.test(str)) return false;
+        const [y, m, d] = str.split("-").map(Number);
+        const dt = new Date(Date.UTC(y, m - 1, d));
+        return (
+          dt.getUTCFullYear() === y &&
+          dt.getUTCMonth() === m - 1 &&
+          dt.getUTCDate() === d
+        );
+      }
+
+      /* Validate a set of fields (add or edit). Returns the cleaned payload or null. */
+      function validateAndCollect(nameVal, descVal, dateVal, statusVal,
+                                   nameErr, descErr, dateErr, statusErr) {
+        let ok = true;
+        const name = nameVal.trim();
+        const desc = descVal.trim();
+        const date = dateVal.trim();
+        const status = statusVal.trim();
+
+        if (!name) { nameErr.classList.add("show"); ok = false; }
+        else clearFieldError(nameErr);
+
+        if (!desc) { descErr.classList.add("show"); ok = false; }
+        else clearFieldError(descErr);
+
+        // Date must be non-empty, match YYYY-MM-DD, and pass a calendar round-trip
+        // (Date.parse alone normalizes impossible dates like 2024-02-30)
+        if (!isValidDate(date)) {
+          dateErr.classList.add("show"); ok = false;
+        } else clearFieldError(dateErr);
+
+        if (!VALID_STATUSES.includes(status)) {
+          statusErr.classList.add("show"); ok = false;
+        } else clearFieldError(statusErr);
+
+        if (!ok) return null;
+        return { name: name, description: desc, target_date: date, status: status };
+      }
+
+      /* Format a UTC timestamp (from backend created_at) for display */
+      function formatTimestamp(raw) {
+        if (!raw) return "—";
+        // Treat the backend value as UTC. If there's no timezone suffix, append Z.
+        let s = String(raw);
+        if (!/[Zz]|[+-]\d{2}:?\d{2}$/.test(s)) s += "Z";
+        const d = new Date(s);
+        if (isNaN(d.getTime())) return String(raw);
+        return d.toLocaleString(undefined, {
+          year: "numeric", month: "short", day: "numeric",
+          hour: "2-digit", minute: "2-digit", timeZone: "UTC"
+        }) + " UTC";
+      }
+
+      /* Map a status string to a CSS badge class */
+      function statusBadgeClass(status) {
+        switch (status) {
+          case "Not Started":  return "not-started";
+          case "In Progress":  return "in-progress";
+          case "Completed":    return "completed";
+          default:             return "not-started";
+        }
+      }
+
+      /* =================================================================
+       * API layer — all fetch calls go through here
+       * ================================================================= */
+
+      async function apiRequest(method, url, body) {
+        const opts = { method, headers: {} };
+        if (body !== undefined) {
+          opts.headers["Content-Type"] = "application/json";
+          opts.body = JSON.stringify(body);
+        }
+        const res = await fetch(url, opts);
+        // Attempt to parse JSON regardless of status code
+        let data = null;
+        try { data = await res.json(); } catch (_) { /* non-JSON response */ }
+
+        if (!res.ok || !data || data.success !== true) {
+          const msg = (data && data.error) ? data.error
+                    : `Request failed (HTTP ${res.status})`;
+          throw new Error(msg);
+        }
+        return data;
+      }
+
+      /* Load all courses from the backend and render them */
+      async function loadCourses() {
+        setBusy(true, "Loading courses…");
+        try {
+          const data = await apiRequest("GET", API_URL);
+          if (!data || !Array.isArray(data.courses)) {
+            throw new Error("Unexpected response format from server.");
+          }
+          renderCourses(data.courses);
+        } catch (err) {
+          // Always show the error on a failed refresh; preserve existing cards
+          showAlert("Could not load courses: " + err.message, "error");
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      /* Create a new course via POST */
+      async function createCourse(payload) {
+        setBusy(true, "Adding course…");
+        try {
+          const data = await apiRequest("POST", API_URL, payload);
+          showAlert("Course added successfully.", "success");
+          await loadCourses();  // re-fetch after mutation
+        } catch (err) {
+          showAlert("Failed to add course: " + err.message, "error");
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      /* Update an existing course via PUT */
+      async function updateCourse(id, payload) {
+        setBusy(true, "Saving changes…");
+        try {
+          const data = await apiRequest("PUT", API_URL + "/" + id, payload);
+          showAlert("Course updated successfully.", "success");
+          closeEditModal();
+          await loadCourses();
+        } catch (err) {
+          showAlert("Failed to update course: " + err.message, "error");
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      /* Delete a course via DELETE */
+      async function deleteCourse(id) {
+        setBusy(true, "Removing course…");
+        try {
+          const data = await apiRequest("DELETE", API_URL + "/" + id);
+          showAlert("Course removed successfully.", "success");
+          await loadCourses();
+        } catch (err) {
+          showAlert("Failed to remove course: " + err.message, "error");
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      /* =================================================================
+       * Rendering — safe DOM creation (no innerHTML for untrusted text)
+       * ================================================================= */
+
+      function renderCourses(courses) {
+        courseList.innerHTML = "";
+
+        if (!courses || courses.length === 0) {
+          // Empty-state message
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75v10.5M9 9.75h6m-6 4.5h6M4.5 4.5h15v15h-15z" />
+            </svg>
+            <p style="margin:.25rem 0 0; font-weight:600;">No courses yet</p>
+            <p style="margin:0; font-size:.85rem;">Add your first course using the form above.</p>
+          `;
+          courseList.appendChild(empty);
+          return;
+        }
+
+        courses.forEach(course => courseList.appendChild(buildCard(course)));
+      }
+
+      /* Build a single course card using safe DOM methods */
+      function buildCard(course) {
+        const card = document.createElement("div");
+        card.className = "course-card";
+
+        /* --- Header: name + status badge --- */
+        const head = document.createElement("div");
+        head.className = "cc-head";
+
+        const nameEl = document.createElement("h3");
+        nameEl.className = "cc-name";
+        nameEl.textContent = course.name || "(unnamed)";
+
+        const badge = document.createElement("span");
+        badge.className = "badge " + statusBadgeClass(course.status);
+        badge.textContent = course.status || "Not Started";
+
+        head.appendChild(nameEl);
+        head.appendChild(badge);
+        card.appendChild(head);
+
+        /* --- Description --- */
+        const desc = document.createElement("p");
+        desc.className = "cc-desc";
+        desc.textContent = course.description || "";
+        card.appendChild(desc);
+
+        /* --- Meta: date, ID, created_at (all read-only) --- */
+        const meta = document.createElement("div");
+        meta.className = "cc-meta";
+
+        meta.appendChild(makeMetaItem("Target Date", course.target_date || "—"));
+        meta.appendChild(makeMetaItem("ID", String(course.id ?? "—")));
+        meta.appendChild(makeMetaItem("Created", formatTimestamp(course.created_at)));
+
+        card.appendChild(meta);
+
+        /* --- Actions: Edit + Remove --- */
+        const actions = document.createElement("div");
+        actions.className = "cc-actions";
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "btn btn-ghost";
+        editBtn.type = "button";
+        editBtn.textContent = "Edit";
+        editBtn.addEventListener("click", () => openEditModal(course));
+
+        const deleteTemplate = document.createElement("template");
+        const courseId = Number(course.id);
+        deleteTemplate.innerHTML = `
+          <button type="button" class="btn btn-danger"
+                  onclick="handleDelete(${courseId})">Remove</button>
+        `;
+        const removeBtn = deleteTemplate.content.firstElementChild;
+
+        actions.appendChild(editBtn);
+        actions.appendChild(removeBtn);
+        card.appendChild(actions);
+
+        return card;
+      }
+
+      /* Helper: build a <span><b>Label:</b> value</span> meta line safely */
+      function makeMetaItem(label, value) {
+        const wrap = document.createElement("span");
+        const b = document.createElement("b");
+        b.textContent = label + ": ";
+        const v = document.createTextNode(value);
+        wrap.appendChild(b);
+        wrap.appendChild(v);
+        return wrap;
+      }
+
+      /* =================================================================
+       * Add form — validation + submit
+       * ================================================================= */
+
+      addForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (busy) return;
+
+        const payload = validateAndCollect(
+          $("name").value, $("description").value,
+          $("target_date").value, $("status").value,
+          $("nameError"), $("descriptionError"),
+          $("target_dateError"), $("statusError")
+        );
+        if (!payload) {
+          showAlert("Please fix the highlighted fields.", "error");
+          return;
+        }
+        createCourse(payload);
+      });
+
+      /* Clear field errors on reset */
+      addForm.addEventListener("reset", () => {
+        ["nameError", "descriptionError", "target_dateError", "statusError"]
+          .forEach(id => clearFieldError($(id)));
+      });
+
+      /* =================================================================
+       * Edit modal — open, populate, save, cancel
+       * ================================================================= */
+
+      function openEditModal(course) {
+        if (busy) return;
+        // Populate fields with existing values
+        $("editId").value          = course.id;
+        $("editName").value        = course.name || "";
+        $("editDescription").value = course.description || "";
+        $("editTargetDate").value  = course.target_date || "";
+        $("editStatus").value      = VALID_STATUSES.includes(course.status)
+                                     ? course.status : "";
+
+        // Clear any stale errors
+        ["editNameError", "editDescriptionError", "editTargetDateError", "editStatusError"]
+          .forEach(id => clearFieldError($(id)));
+
+        editBackdrop.classList.add("show");
+        $("editName").focus();
+      }
+
+      function closeEditModal() {
+        editBackdrop.classList.remove("show");
+      }
+
+      editForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (busy) return;
+
+        const id = $("editId").value;
+        if (!id) { showAlert("Cannot edit: missing course ID.", "error"); return; }
+
+        const payload = validateAndCollect(
+          $("editName").value, $("editDescription").value,
+          $("editTargetDate").value, $("editStatus").value,
+          $("editNameError"), $("editDescriptionError"),
+          $("editTargetDateError"), $("editStatusError")
+        );
+        if (!payload) {
+          showAlert("Please fix the highlighted fields.", "error");
+          return;
+        }
+        // Never send id or created_at in the PUT body
+        updateCourse(id, payload);
+      });
+
+      editCloseBtn.addEventListener("click", closeEditModal);
+      editCancelBtn.addEventListener("click", closeEditModal);
+
+      /* Close edit modal on backdrop click (only if not busy) */
+      editBackdrop.addEventListener("click", (e) => {
+        if (e.target === editBackdrop && !busy) closeEditModal();
+      });
+
+      /* =================================================================
+       * Confirm-removal modal
+       * ================================================================= */
+
+      function openConfirm(course) {
+        if (busy) return;
+        pendingDeleteId = course.id;
+        // Use textContent for the course name (safe)
+        confirmNameEl.textContent = course.name || "(unnamed)";
+        confirmBackdrop.classList.add("show");
+        confirmYesBtn.focus();
+      }
+
+      function closeConfirm() {
+        confirmBackdrop.classList.remove("show");
+        pendingDeleteId = null;
+      }
+
+      confirmYesBtn.addEventListener("click", () => {
+        if (busy || pendingDeleteId === null) return;
+        const id = pendingDeleteId;
+        closeConfirm();
+        deleteCourse(id);
+      });
+
+      confirmNoBtn.addEventListener("click", closeConfirm);
+
+      confirmBackdrop.addEventListener("click", (e) => {
+        if (e.target === confirmBackdrop && !busy) closeConfirm();
+      });
+
+      /* =================================================================
+       * Refresh button
+       * ================================================================= */
+
+      refreshBtn.addEventListener("click", () => {
+        if (busy) return;
+        // Clear any existing success/error so the refresh result is visible
+        alertBox.className = "";
+        alertBox.textContent = "";
+        loadCourses();
+      });
+
+      /* =================================================================
+       * Keyboard: Esc closes modals
+       * ================================================================= */
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          if (editBackdrop.classList.contains("show") && !busy) closeEditModal();
+          if (confirmBackdrop.classList.contains("show") && !busy) closeConfirm();
+        }
+      });
+
+      /* =================================================================
+       * Initial load
+       * ================================================================= */
+      loadCourses();
+    
+      // Confirm removal before sending the DELETE request.
+      function handleDelete(courseId) {
+        if (busy) return;
+        if (!Number.isInteger(courseId) || courseId < 1) return;
+        if (window.confirm("Are you sure you want to remove this course?")) {
+          deleteCourse(courseId);
+        }
+      }
+
+    </script>
+  </body>
+</html>

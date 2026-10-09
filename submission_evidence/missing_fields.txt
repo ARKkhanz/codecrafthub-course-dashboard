@@ -1,0 +1,6 @@
+curl -sS --max-time 15 -X POST http://localhost:5000/api/courses -H 'Content-Type: application/json' -d '{"name": "Incomplete"}' -w '
+HTTP_STATUS:%{http_code}
+'
+{"error":"Missing required field: description","success":false}
+
+HTTP_STATUS:400

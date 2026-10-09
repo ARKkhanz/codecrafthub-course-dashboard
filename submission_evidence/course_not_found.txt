@@ -1,0 +1,6 @@
+curl -sS --max-time 15 -X GET http://localhost:5000/api/courses/1 -w '
+HTTP_STATUS:%{http_code}
+'
+{"error":"Course not found","success":false}
+
+HTTP_STATUS:404
